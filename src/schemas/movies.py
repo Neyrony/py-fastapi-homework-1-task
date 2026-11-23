@@ -14,7 +14,7 @@ class MovieBase(BaseModel):
     orig_title: str = Field(max_length=255)
     status: str = Field(max_length=50)
     orig_lang: str = Field(max_length=50)
-    budget: Decimal = Field(max_digits=10, decimal_places=2)
+    budget: float
     revenue: float
     country: str = Field(max_length=3)
 
@@ -31,4 +31,3 @@ class MovieListResponseSchema(BaseModel):
     next_page: str | None = None
     total_pages: int = Field(ge=1)
     total_items: int = Field(ge=0)
-
