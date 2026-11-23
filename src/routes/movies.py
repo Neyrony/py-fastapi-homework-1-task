@@ -2,15 +2,15 @@ import math
 
 from fastapi import APIRouter, HTTPException, status, Request
 
-from crud.movies import count_movies, all_movies
+from crud.movies import count_movies, all_movies, get_movie
 from dependencies.db import SessionDep
 from dependencies.pagination import PaginationHelper
-from schemas import MovieListResponseSchema
+from schemas import MovieListResponseSchema, MovieDetailResponseSchema
 
 router = APIRouter()
 
 
-@router.get("/movies/", response_model=MovieListResponseSchema)
+@router.get("/movies/", response_model=MovieListResponseSchema, responses={404: {"description": "No movies found"}})
 async def get_paginated_movies(
     db: SessionDep, pagination: PaginationHelper, request: Request
 ):
@@ -50,3 +50,13 @@ async def get_paginated_movies(
         total_pages=total_pages,
         total_items=total_movies,
     )
+
+
+@router.get("/movies/{movie_id}/", response_model=MovieDetailResponseSchema, responses={404: {"description": "Movie with the given ID was not found."}})
+async def get_movie_detail(db: SessionDep, movie_id: int):
+    movie = await get_movie(db=db, movie_id=movie_id)
+
+    if movie is None:
+        raise HTTPException(detail="Movie with the given ID was not found.", status_code=status.HTTP_404_NOT_FOUND)
+
+    return movie
